@@ -1,0 +1,233 @@
+[
+  {
+    "id": "w1-resume1",
+    "day": 1,
+    "category": "Resume Understanding",
+    "title": "Attend Resume Understanding SOP walkthrough",
+    "description": "Understand the core processes of analyzing candidate profiles, verifying tech stacks, and mapping project timelines."
+  },
+  {
+    "id": "w1-resume-mistakes",
+    "day": 1,
+    "category": "Resume Understanding",
+    "title": "Review checklist of common resume mistakes",
+    "description": "Study the playbook for identifying exaggerated architectures, generic storylines, or mismatched timelines."
+  },
+  {
+    "id": "w1-resume2",
+    "day": 2,
+    "category": "Resume Understanding",
+    "title": "Shadow 2–3 active candidate resume prep sessions",
+    "description": "Observe a Team Lead running active candidate calls and take detailed notes on call flow and questioning."
+  },
+  {
+    "id": "w1-resume3",
+    "day": 3,
+    "category": "Resume Understanding",
+    "title": "Create sample candidate project document",
+    "description": "Practice drafting an end-to-end project description sheet detailing system architecture, user stories, and role scope."
+  },
+  {
+    "id": "w1-resume4",
+    "day": 4,
+    "category": "Resume Understanding",
+    "title": "Draft project architecture and tech stack diagram",
+    "description": "Map out components, database schemas, integration layers, and infrastructure configurations for practice."
+  },
+  {
+    "id": "w1-resume5",
+    "day": 5,
+    "category": "Resume Understanding",
+    "title": "Draft candidate project verbal storyline",
+    "description": "Write a clear, structured explanation mapping project challenges, technical choices, and resolutions."
+  },
+  {
+    "id": "w1-resume6",
+    "day": 6,
+    "category": "Resume Understanding",
+    "title": "Conduct 1 supervised candidate resume prep call",
+    "description": "Lead the call under buddy observation; receive real-time feedback on tone, pace, and alignment."
+  },
+  {
+    "id": "w1-resume8",
+    "day": 7,
+    "category": "Resume Understanding",
+    "title": "Pass Resume Understanding TL evaluation review",
+    "description": "Obtain official sign-off from your Lead on project documentation and profile analysis capabilities."
+  },
+  {
+    "id": "w1-mock1",
+    "day": 8,
+    "category": "Mock Interviews",
+    "title": "Observe 2 active mock interviews",
+    "description": "Audit real mock sessions, noting evaluation formats, rubrics, and feedback logs."
+  },
+  {
+    "id": "w1-mock2",
+    "day": 9,
+    "category": "Mock Interviews",
+    "title": "Learn interviewer tone, pacing & answer-guiding rules",
+    "description": "Study strict SOPs regarding time management, positive reinforcement, and redirecting candidate focus."
+  },
+  {
+    "id": "w1-mock3",
+    "day": 10,
+    "category": "Mock Interviews",
+    "title": "Practice live Google Doc feedback logging",
+    "description": "Log candidate answers and real-time ratings dynamically during shadow sessions without lagging."
+  },
+  {
+    "id": "w1-mock4",
+    "day": 11,
+    "category": "Mock Interviews",
+    "title": "Conduct 1 mock interview under direct TL supervision",
+    "description": "Conduct a full mock session as the lead interviewer; receive structured performance comments."
+  },
+  {
+    "id": "w1-mock5",
+    "day": 12,
+    "category": "Mock Interviews",
+    "title": "Review mock evaluation performance & address gap areas",
+    "description": "Discuss feedback with your TL and complete targeted practice drills to address alignment gaps."
+  },
+  {
+    "id": "w1-assess1",
+    "day": 13,
+    "category": "Assessment Operations",
+    "title": "Walk through all assessment platforms",
+    "description": "Configure and log into platforms like HackerRank, Codility, and internal test modules."
+  },
+  {
+    "id": "w1-assess2",
+    "day": 14,
+    "category": "Assessment Operations",
+    "title": "Learn platform credentials security & access protocols",
+    "description": "Study the rules for permissions, candidate logins, and access-denial email templates."
+  },
+  {
+    "id": "w1-assess3",
+    "day": 15,
+    "category": "Assessment Operations",
+    "title": "Learn screen/audio recording compliance rules",
+    "description": "Understand the requirements for starting recordings, verifying webcam feeds, and isolating screens."
+  },
+  {
+    "id": "w1-assess4",
+    "day": 16,
+    "category": "Assessment Operations",
+    "title": "Solve sample coding & analytical reasoning tests",
+    "description": "Complete internal test sets to understand candidate experiences and common issues."
+  },
+  {
+    "id": "w1-assess5",
+    "day": 17,
+    "category": "Assessment Operations",
+    "title": "Observe 1–2 assessment support sessions",
+    "description": "Shadow a coordinator checking credentials, starting streams, and logging activity."
+  },
+  {
+    "id": "w1-assess7",
+    "day": 17,
+    "category": "Assessment Operations",
+    "title": "Review zero-tolerance rules for assessment support",
+    "description": "Study strict compliance rules against credentials helper leakage or screen sharing violations."
+  },
+  {
+    "id": "w1-assess6",
+    "day": 18,
+    "category": "Assessment Operations",
+    "title": "Complete internal assessment coordinator capability test",
+    "description": "Pass the operational readiness exam to gain credential rights."
+  },
+  {
+    "id": "w2-client2",
+    "day": 19,
+    "category": "Client Alignment",
+    "title": "Learn professional client communication SLAs",
+    "description": "Study professional phrasing, feedback guidelines, SLA response timelines, and boundaries."
+  },
+  {
+    "id": "w2-interview1",
+    "day": 19,
+    "category": "Client Alignment",
+    "title": "Learn 30-20-10 calling protocol & calendar setup",
+    "description": "Understand intervals for candidate outreach and calendar invite details."
+  },
+  {
+    "id": "w1-comp3",
+    "day": 20,
+    "category": "Phase 1 Completion",
+    "title": "Pass Month 1 Phase 1 (Training) readiness evaluation",
+    "description": "Score 90%+ in the comprehensive review to unlock Phase 2 Hands-on Floor entry."
+  },
+  {
+    "id": "w2-client1",
+    "day": 21,
+    "category": "Hands-on Floor",
+    "title": "Observe 3 client intake calls with Buddy",
+    "description": "Listen to client feedback sessions and draft candidate requirements sheets."
+  },
+  {
+    "id": "w2-client3",
+    "day": 22,
+    "category": "Hands-on Floor",
+    "title": "Conduct 1 supervised client brief call",
+    "description": "Manage candidate brief sessions under active lead observation."
+  },
+  {
+    "id": "w2-interview2",
+    "day": 23,
+    "category": "Hands-on Floor",
+    "title": "Schedule invites and execute 30-20-10 protocol checks",
+    "description": "Create calendar invites and run candidate outreach checks solo."
+  },
+  {
+    "id": "w2-interview3",
+    "day": 24,
+    "category": "Hands-on Floor",
+    "title": "Perform screen & audio sharing tests on floor",
+    "description": "Test and isolate feed issues for active candidate coding trials."
+  },
+  {
+    "id": "w2-interview6",
+    "day": 25,
+    "category": "Hands-on Floor",
+    "title": "Log live Q&A feeds for 2 screening sessions",
+    "description": "Input candidate evaluations live into tracking spreadsheets during active calls."
+  },
+  {
+    "id": "w2-client4",
+    "day": 26,
+    "category": "Hands-on Floor",
+    "title": "Compile and submit 2 completed candidate profiles",
+    "description": "Write client-ready resume summaries and get TL approval."
+  },
+  {
+    "id": "w3-mastery3",
+    "day": 27,
+    "category": "Hands-on Floor",
+    "title": "Coordinate setup & recordings for 3 assessments solo",
+    "description": "Manage the full assessment flow from credentials checks to record uploads."
+  },
+  {
+    "id": "w3-zero2",
+    "day": 28,
+    "category": "Hands-on Floor",
+    "title": "Audit audio/video logs for cheating compliance",
+    "description": "Review recordings of completed sessions for compliance violations against SOPs."
+  },
+  {
+    "id": "w3-mastery4",
+    "day": 29,
+    "category": "Hands-on Floor",
+    "title": "Resolve candidate credentials blockages independently",
+    "description": "Resolve access blockages and candidate setup issues solo."
+  },
+  {
+    "id": "w3-comp1",
+    "day": 30,
+    "category": "Month 1 Completion",
+    "title": "Pass Month 1 Hands-on floor entry certification review",
+    "description": "Achieve 95%+ in the practical execution review to graduate to Month 2 Supervised Execution."
+  }
+]

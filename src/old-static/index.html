@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>New Joiner Training Checklist (3‑Week Onboarding SOP)</title>
+    <style>
+        /*
+         * Base dark theme inspired by the user's supplied design. Variables drive
+         * colour selection throughout the page so customising the palette in one
+         * place will cascade to all components. The layout uses CSS grid and
+         * flexbox to organise cards, lists and tables without external
+         * frameworks.
+         */
+        :root{
+          --bg: #0b1220;
+          --panel: rgba(255,255,255,0.06);
+          --panel-2: rgba(255,255,255,0.08);
+          --text: rgba(255,255,255,0.92);
+          --muted: rgba(255,255,255,0.68);
+          --line: rgba(255,255,255,0.12);
+          --accent: #7c5cff;
+          --good: #3ddc97;
+          --warn: #ffcc66;
+          --danger: #ff5c7a;
+          --shadow: 0 18px 50px rgba(0,0,0,0.45);
+          --radius: 18px;
+        }
+        *{ box-sizing: border-box; }
+        html{ height: 100%; background: var(--bg); }
+        body{
+          margin: 0;
+          min-height: 100%;
+          font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+          color: var(--text);
+          background:
+            radial-gradient(1200px 700px at 20% 10%, rgba(124,92,255,0.35), transparent 60%),
+            radial-gradient(900px 600px at 85% 25%, rgba(61,220,151,0.18), transparent 55%),
+            radial-gradient(800px 600px at 40% 95%, rgba(255,92,122,0.14), transparent 55%),
+            var(--bg);
+          line-height: 1.5;
+        }
+        a{ color: inherit; text-decoration: none; }
+        .wrap{
+          width: min(1100px, 92vw);
+          margin: 36px auto 70px;
+        }
+        /* --- Header --- */
+        .hero{
+          border: 1px solid var(--line);
+          background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+          border-radius: var(--radius);
+          padding: 26px 26px 18px;
+          box-shadow: var(--shadow);
+          position: relative;
+          overflow: hidden;
+        }
+        .hero::after{
+          content:"";
+          position:absolute;
+          inset:-2px;
+          background:
+            radial-gradient(500px 180px at 30% 0%, rgba(124,92,255,0.25), transparent 60%),
+            radial-gradient(420px 160px at 90% 30%, rgba(61,220,151,0.12), transparent 60%);
+          pointer-events:none;
+          filter: blur(10px);
+          opacity: 0.9;
+        }
+        .badge-row{
+          display:flex; gap:10px; flex-wrap:wrap;
+          margin-bottom: 12px;
+        }
+        .badge{
+          display:inline-flex; align-items:center; gap:8px;
+          padding: 8px 12px;
+          border-radius: 999px;
+          border: 1px solid var(--line);
+          background: rgba(255,255,255,0.05);
+          color: var(--muted);
+          font-size: 13px;
+        }
+        .badge .dot{
+          width: 8px; height: 8px; border-radius: 99px; background: var(--accent);
+          box-shadow: 0 0 0 3px rgba(124,92,255,0.18);
+        }
+        h1{
+          margin: 0 0 8px;
+          font-size: clamp(22px, 3.2vw, 34px);
+          letter-spacing: -0.4px;
+        }
+        .sub{
+          margin: 0 0 16px;
+          color: var(--muted);
+          max-width: 80ch;
+        }
+        /* Quick Stats */
+        .quick{
+          display:grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 12px;
+          margin-top: 14px;
+        }
+        .stat{
+          border: 1px solid var(--line);
+          background: rgba(255,255,255,0.04);
+          border-radius: 16px;
+          padding: 14px 14px 12px;
+        }
+        .stat b{ display:block; font-size: 14px; margin-bottom: 6px; }
+        .stat span{ color: var(--muted); font-size: 13px; }
+        /* Layout */
+        .grid{
+          display:grid;
+          grid-template-columns: 1.5fr 1fr;
+          gap: 16px;
+          margin-top: 16px;
+          align-items:start;
+        }
+        /* Cards */
+        .card{
+          border: 1px solid var(--line);
+          background: var(--panel);
+          border-radius: var(--radius);
+          box-shadow: var(--shadow);
+          overflow: visible;
+        }
+        .card .head{
+          padding: 18px 18px 14px;
+          border-bottom: 1px solid var(--line);
+          background: linear-gradient(180deg, rgba(255,255,255,0.06), transparent);
+          display:flex;
+          justify-content: space-between;
+          gap: 14px;
+        }
+        .title{ display:flex; gap: 10px; }
+        .kicker{
+          font-size: 12px;
+          color: var(--muted);
+          letter-spacing: 0.4px;
+          text-transform: uppercase;
+        }
+        .card h2{
+          margin: 2px 0 0;
+          font-size: 18px;
+        }
+        .goal{
+          margin: 8px 0 0;
+          color: var(--muted);
+          font-size: 13px;
+        }
+        .pill{
+          border: 1px solid var(--line);
+          background: rgba(255,255,255,0.05);
+          color: var(--muted);
+          padding: 8px 10px;
+          border-radius: 999px;
+          font-size: 12px;
+        }
+        /* Sections */
+        .section{
+          padding: 14px;
+          border: 1px solid var(--line);
+          background: rgba(255,255,255,0.04);
+          border-radius: 16px;
+          margin-bottom: 12px;
+        }
+        .section h3{
+          margin: 0 0 10px;
+          font-size: 14px;
+          display:flex; align-items:center; gap: 10px;
+        }
+        .icon{
+          width: 30px; height: 30px;
+          border-radius: 12px;
+          display:grid; place-items:center;
+          background: rgba(124,92,255,0.18);
+          border: 1px solid rgba(124,92,255,0.35);
+          box-shadow: 0 10px 24px rgba(124,92,255,0.12);
+        }
+        /* Checklist lists */
+        ul.checklist{
+          list-style:none;
+          padding: 0;
+          margin: 0;
+          display:grid;
+          gap: 10px;
+        }
+        .checklist li{
+          display:flex;
+          gap: 10px;
+          padding: 10px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,255,255,0.10);
+          background: rgba(0,0,0,0.12);
+        }
+        .checklist input{
+          margin-top: 3px;
+          accent-color: var(--accent);
+          transform: scale(1.05);
+        }
+        .checklist label{
+          color: rgba(255,255,255,0.86);
+          font-size: 14px;
+          cursor:pointer;
+        }
+        .checklist small{
+          display:block;
+          color: var(--muted);
+          font-size: 12px;
+          margin-top: 4px;
+        }
+        /* Completed Section */
+        .complete{
+          border: 1px dashed rgba(61,220,151,0.35);
+          background: rgba(61,220,151,0.08);
+        }
+        /* Sidebar */
+        .sidebar .body{ padding: 16px; }
+        .callout{
+          border: 1px solid rgba(255,92,122,0.35);
+          background: rgba(255,92,122,0.10);
+          border-radius: 16px;
+          padding: 14px;
+        }
+        .danger-icon{
+          width: 30px; height: 30px;
+          border-radius: 12px;
+          display:grid; place-items:center;
+          background: rgba(255,92,122,0.18);
+          border: 1px solid rgba(255,92,122,0.35);
+          box-shadow: 0 10px 24px rgba(255,92,122,0.10);
+        }
+        .callout ul{
+          margin: 10px 0 0;
+          padding-left: 18px;
+          color: rgba(255,255,255,0.86);
+        }
+        .meta{
+          margin-top: 12px;
+          border: 1px solid var(--line);
+          background: rgba(255,255,255,0.04);
+          border-radius: 16px;
+          padding: 14px;
+          color: var(--muted);
+          font-size: 13px;
+        }
+        .footer{
+          margin-top: 14px;
+          color: var(--muted);
+          font-size: 12px;
+          text-align:center;
+        }
+        /* Team navigation at top of page */
+        .team-links{
+          margin: 12px 0 0;
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+        }
+        .team-links a{
+          padding: 6px 12px;
+          border: 1px solid var(--line);
+          background: rgba(255,255,255,0.05);
+          border-radius: 999px;
+          font-size: 13px;
+          color: var(--muted);
+          transition: background 0.2s;
+        }
+        .team-links a:hover{ background: rgba(255,255,255,0.10); }
+        /* Responsive */
+        @media (max-width: 920px){
+          .grid{ grid-template-columns: 1fr; }
+          .quick{ grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<main class="wrap">
+  <section class="hero">
+    <button onclick="clearAllCookies()" style="position:absolute; top:10px; right:10px; background: rgba(255,255,255,0.1); border:1px solid var(--line); color:var(--text); padding:6px 12px; border-radius:6px; cursor:pointer;">Reset All Data</button>
+    <div class="badge-row">
+      <span class="badge"><span class="dot"></span> 3 Week Program</span>
+      <span class="badge"><span class="dot"></span> New Joiner Training</span>
+      <span class="badge"><span class="dot"></span> SOP</span>
+    </div>
+    <h1>New Joiner Training Checklist</h1>
+    <p class="sub">Welcome to the team! This structured three‑week onboarding guide will help you ramp up effectively. Work through the tasks at your own pace and use the checkboxes to track progress.</p>
+    <!-- navigation to team pages -->
+    <div class="team-links">
+      <a href="team_darshan.html">Team Darshan</a>
+      <a href="team_anusree.html">Team Anusree</a>
+      <a href="team_prateek.html">Team Prateek</a>
+      <a href="team_bhavya.html">Team Bhavya</a>
+    </div>
+    <div class="quick">
+      <div class="stat"><b>Week 1</b><span>Foundation Training</span></div>
+      <div class="stat"><b>Week 2</b><span>Controlled Execution</span></div>
+      <div class="stat"><b>Week 3</b><span>Error‑Free Execution</span></div>
+    </div>
+  </section>
+  <div class="grid">
+    <div>
+      <!-- Week 1 Card -->
+      <div class="card">
+        <div class="head">
+          <div class="title">
+            <div>
+              <div class="kicker">Week&nbsp;1</div>
+              <h2>Week&nbsp;1 — Foundation Training</h2>
+              <div class="goal">Learn Resume Understanding, Mock Interviews &amp; Assessments</div>
+            </div>
+          </div>
+          <span class="pill">Training</span>
+        </div>
+        <div class="body" style="padding:16px;">
+          <!-- Updated Week 1 sections -->
+          <div class="section">
+            <h3><span class="icon">📄</span> Resume Understanding</h3>
+            <ul class="checklist">
+              <li><input type="checkbox" id="w1-resume1" /><label for="w1-resume1">Attend Resume Understanding SOP walkthrough</label></li>
+              <li><input type="checkbox" id="w1-resume2" /><label for="w1-resume2">Shadow 2–3 resume prep sessions</label></li>
+              <li><input type="checkbox" id="w1-resume3" /><label for="w1-resume3">Create sample end-to-end project document</label></li>
+              <li><input type="checkbox" id="w1-resume4" /><label for="w1-resume4">Create project architecture + tech stack explanation</label></li>
+              <li><input type="checkbox" id="w1-resume5" /><label for="w1-resume5">Draft project storyline</label></li>
+              <li><input type="checkbox" id="w1-resume6" /><label for="w1-resume6">Conduct 1 supervised resume prep call</label></li>
+              <li><input type="checkbox" id="w1-resume7" /><label for="w1-resume7">Review resume mistakes &amp; correction patterns</label></li>
+              <li><input type="checkbox" id="w1-resume8" /><label for="w1-resume8">Get approval from TL</label></li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3><span class="icon">🎤</span> Mock Interview Training</h3>
+            <ul class="checklist">
+              <li><input type="checkbox" id="w1-mock1" /><label for="w1-mock1">Observe 2 mock interviews</label></li>
+              <li><input type="checkbox" id="w1-mock2" /><label for="w1-mock2">Learn tone, answer‑guiding &amp; timing rules</label></li>
+              <li><input type="checkbox" id="w1-mock3" /><label for="w1-mock3">Practice live Google Doc updating</label></li>
+              <li><input type="checkbox" id="w1-mock4" /><label for="w1-mock4">Conduct 1 mock interview under supervision</label></li>
+              <li><input type="checkbox" id="w1-mock5" /><label for="w1-mock5">Receive evaluation &amp; feedback</label></li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3><span class="icon">🧪</span> Assessment Support Training</h3>
+            <ul class="checklist">
+              <li><input type="checkbox" id="w1-assess1" /><label for="w1-assess1">Understand all assessment platforms</label></li>
+              <li><input type="checkbox" id="w1-assess2" /><label for="w1-assess2">Learn access/no‑access protocol</label></li>
+              <li><input type="checkbox" id="w1-assess3" /><label for="w1-assess3">Learn recording mandatory rule</label></li>
+              <li><input type="checkbox" id="w1-assess4" /><label for="w1-assess4">Practice solving coding + reasoning examples</label></li>
+              <li><input type="checkbox" id="w1-assess5" /><label for="w1-assess5">Observe 1–2 assessment support sessions</label></li>
+              <li><input type="checkbox" id="w1-assess6" /><label for="w1-assess6">Complete internal assessment test</label></li>
+              <li><input type="checkbox" id="w1-assess7" /><label for="w1-assess7">Review zero‑tolerance rules for assessments</label></li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3><span class="icon">📌</span> Week 1 Completion</h3>
+            <ul class="checklist">
+              <li><input type="checkbox" id="w1-comp1" /><label for="w1-comp1">All tasks completed same day</label></li>
+              <li><input type="checkbox" id="w1-comp2" /><label for="w1-comp2">All notes maintained in Google Doc</label></li>
+              <li><input type="checkbox" id="w1-comp3" /><label for="w1-comp3">Passed Week 1 readiness evaluation (80%+)</label></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- Week 2 Card -->
+      <div class="card" style="margin-top:16px;">
+        <div class="head">
+          <div class="title">
+            <div class="kicker">Week&nbsp;2</div>
+            <h2>Week&nbsp;2 — Controlled Execution</h2>
+            <div class="goal">Client interaction + Interview Support + Completing Week&nbsp;1 tasks</div>
+          </div>
+          <span class="pill">Execution</span>
+        </div>
+        <div class="body" style="padding:16px;">
+          <!-- Updated Week 2 sections -->
+          <div class="section">
+            <h3><span class="icon">🤝</span> Client Interaction Training</h3>
+            <ul class="checklist">
+              <li><input type="checkbox" id="w2-client1" /><label for="w2-client1">Attend 3 client calls as observer</label></li>
+              <li><input type="checkbox" id="w2-client2" /><label for="w2-client2">Learn professional communication etiquette</label></li>
+              <li><input type="checkbox" id="w2-client3" /><label for="w2-client3">Conduct 1 supervised client call</label></li>
+              <li><input type="checkbox" id="w2-client4" /><label for="w2-client4">Document candidate details correctly</label></li>
+              <li><input type="checkbox" id="w2-client5" /><label for="w2-client5">Get call handling approved by TL</label></li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3><span class="icon">🎧</span> Interview Support (Screening Round)</h3>
+            <ul class="checklist">
+              <li><input type="checkbox" id="w2-interview1" /><label for="w2-interview1">Understand 30–20–10 calling protocol</label></li>
+              <li><input type="checkbox" id="w2-interview2" /><label for="w2-interview2">Create correct calendar invites</label></li>
+              <li><input type="checkbox" id="w2-interview3" /><label for="w2-interview3">Practice screen/audio‑sharing checks</label></li>
+              <li><input type="checkbox" id="w2-interview4" /><label for="w2-interview4">Shadow 2 interview support sessions</label></li>
+              <li><input type="checkbox" id="w2-interview5" /><label for="w2-interview5">Conduct 1 supervised interview support session</label></li>
+              <li><input type="checkbox" id="w2-interview6" /><label for="w2-interview6">Learn how to add Q&amp;A live during call</label></li>
+              <li><input type="checkbox" id="w2-interview7" /><label for="w2-interview7">Understand timing &amp; tone management</label></li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3><span class="icon">🗂️</span> Complete Week 1 Backlog</h3>
+            <ul class="checklist">
+              <li><input type="checkbox" id="w2-backlog1" /><label for="w2-backlog1">Finish pending resume documents</label></li>
+              <li><input type="checkbox" id="w2-backlog2" /><label for="w2-backlog2">Finish assessment practice tasks</label></li>
+              <li><input type="checkbox" id="w2-backlog3" /><label for="w2-backlog3">Review all SOPs again</label></li>
+              <li><input type="checkbox" id="w2-backlog4" /><label for="w2-backlog4">Sign Week&nbsp;1 + Week&nbsp;2 SOP acknowledgment</label></li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3><span class="icon">✅</span> Week 2 Completion</h3>
+            <ul class="checklist">
+              <li><input type="checkbox" id="w2-comp1" /><label for="w2-comp1">Passed Week&nbsp;2 readiness evaluation (90%+)</label></li>
+              <li><input type="checkbox" id="w2-comp2" /><label for="w2-comp2">No SOP violations</label></li>
+              <li><input type="checkbox" id="w2-comp3" /><label for="w2-comp3">No missed communication or documentation</label></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- Week 3 Card -->
+      <div class="card" style="margin-top:16px;">
+        <div class="head">
+          <div class="title">
+            <div class="kicker">Week&nbsp;3</div>
+            <h2>Week&nbsp;3 — Error‑Free Execution</h2>
+            <div class="goal">Perform independently, show Zero‑Mistake compliance</div>
+          </div>
+          <span class="pill">Execution</span>
+        </div>
+        <div class="body" style="padding:16px;">
+          <!-- Updated Week 3 sections -->
+          <div class="section">
+            <h3><span class="icon">🧠</span> SOP Mastery</h3>
+            <ul class="checklist">
+              <li><input type="checkbox" id="w3-mastery1" /><label for="w3-mastery1">Perform Resume Understanding independently</label></li>
+              <li><input type="checkbox" id="w3-mastery2" /><label for="w3-mastery2">Conduct mock interviews independently</label></li>
+              <li><input type="checkbox" id="w3-mastery3" /><label for="w3-mastery3">Execute assessment support independently</label></li>
+              <li><input type="checkbox" id="w3-mastery4" /><label for="w3-mastery4">Handle screening support with minimal guidance</label></li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3><span class="icon">🛡️</span> Zero‑Error Performance</h3>
+            <ul class="checklist">
+              <li><input type="checkbox" id="w3-zero1" /><label for="w3-zero1">No delays in document creation</label></li>
+              <li><input type="checkbox" id="w3-zero2" /><label for="w3-zero2">No missed recordings</label></li>
+              <li><input type="checkbox" id="w3-zero3" /><label for="w3-zero3">No missed 30–20–10 checks</label></li>
+              <li><input type="checkbox" id="w3-zero4" /><label for="w3-zero4">No vague/one‑line feedback</label></li>
+              <li><input type="checkbox" id="w3-zero5" /><label for="w3-zero5">No communication gaps</label></li>
+              <li><input type="checkbox" id="w3-zero6" /><label for="w3-zero6">All Google Docs updated in real time</label></li>
+              <li><input type="checkbox" id="w3-zero7" /><label for="w3-zero7">Daily progress sent to TL/Manager</label></li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3><span class="icon">🎯</span> Weekly Execution Tasks</h3>
+            <ul class="checklist">
+              <li><input type="checkbox" id="w3-exec1" /><label for="w3-exec1">Complete 2–3 resume understanding tasks solo</label></li>
+              <li><input type="checkbox" id="w3-exec2" /><label for="w3-exec2">Support 1–2 interviews (light supervision)</label></li>
+              <li><input type="checkbox" id="w3-exec3" /><label for="w3-exec3">Support 1–2 assessments (light supervision)</label></li>
+              <li><input type="checkbox" id="w3-exec4" /><label for="w3-exec4">Fix any issues flagged by TL/Manager</label></li>
+            </ul>
+          </div>
+          <div class="section">
+            <h3><span class="icon">📌</span> Week 3 Completion</h3>
+            <ul class="checklist">
+              <li><input type="checkbox" id="w3-comp1" /><label for="w3-comp1">Passed Final Evaluation (95%+)</label></li>
+              <li><input type="checkbox" id="w3-comp2" /><label for="w3-comp2">Cleared performance checklist</label></li>
+              <li><input type="checkbox" id="w3-comp3" /><label for="w3-comp3">Zero violations during week</label></li>
+              <li><input type="checkbox" id="w3-comp4" /><label for="w3-comp4">Ready for Active Assignment Pool</label></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="card">
+        <div class="head">
+          <div class="title">
+            <div class="kicker">Help</div>
+            <h2>Resources &amp; Tips</h2>
+          </div>
+          <span class="pill">Read Me</span>
+        </div>
+        <div class="body">
+          <div class="callout">
+            <div style="display:flex;align-items:center;gap:8px;">
+              <span class="danger-icon">🚨</span>
+              <div style="flex:1;">
+                <strong>Zero‑Tolerance Reminder</strong>
+                <p style="margin:4px 0 6px;font-size:13px;">Applies from Day&nbsp;1 for new joiners:</p>
+                <ul style="padding-left:18px;margin:0;font-size:13px;">
+                  <li>No missed pre‑checks</li>
+                  <li>No missed recordings</li>
+                  <li>No access‑denial email missing</li>
+                  <li>No lapse in documentation</li>
+                  <li>No AI‑generated feedback</li>
+                  <li>No late task updates</li>
+                  <li>Assessments completed within 72 hours</li>
+                  <li>No impersonation or misrepresentation</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="meta">
+            <p><strong>Need help?</strong> Reach out to your onboarding buddy or HR for assistance. Join our Teams Channel to communicate only.</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+  <p class="footer">© 2026 Company Name – Adapted for demo purposes</p>
+</main>
+  <!-- Persist checkbox state using cookies -->
+  <script>
+    /* Persist the state of all checklist checkboxes across sessions using cookies instead of localStorage.
+       A single cookie stores a JSON object keyed by checkbox IDs. When a checkbox changes, the cookie is updated.
+       This approach avoids using localStorage so the site can be hosted as static on Vercel without client storage APIs. */
+    (function () {
+      // Helper to set a cookie valid for 1 year
+      function setCookie(name, value) {
+        var d = new Date();
+        d.setTime(d.getTime() + (365 * 24 * 60 * 60 * 1000));
+        var expires = 'expires=' + d.toUTCString();
+        document.cookie = encodeURIComponent(name) + '=' + encodeURIComponent(value) + '; ' + expires + '; path=/';
+      }
+      // Helper to get a cookie by name
+      function getCookie(name) {
+        var decoded = decodeURIComponent(document.cookie || '');
+        var parts = decoded.split('; ');
+        for (var i = 0; i < parts.length; i++) {
+          var pair = parts[i].split('=');
+          if (pair[0] === name) {
+            return pair[1];
+          }
+        }
+        return null;
+      }
+      document.addEventListener('DOMContentLoaded', function () {
+        var cookieName = 'index_progress';
+        var state = {};
+        try {
+          var savedCookie = getCookie(cookieName);
+          if (savedCookie) {
+            state = JSON.parse(savedCookie);
+          }
+        } catch (err) {
+          state = {};
+        }
+        document.querySelectorAll('input[type="checkbox"][id]').forEach(function (cb) {
+          var key = cb.id;
+          if (Object.prototype.hasOwnProperty.call(state, key)) {
+            cb.checked = state[key];
+          }
+          cb.addEventListener('change', function () {
+            state[key] = cb.checked;
+            try {
+              setCookie(cookieName, JSON.stringify(state));
+            } catch (err) {
+              // ignore errors
+            }
+          });
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
