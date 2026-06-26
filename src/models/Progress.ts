@@ -5,6 +5,7 @@ export interface IProgress extends Document {
   day: number;
   taskId: string;
   completed: boolean;
+  inProgress?: boolean;
   notes?: string;
   updatedAt: Date;
 }
@@ -14,6 +15,7 @@ const ProgressSchema = new Schema<IProgress>({
   day: { type: Number, required: true },
   taskId: { type: String, required: true },
   completed: { type: Boolean, default: false },
+  inProgress: { type: Boolean, default: false },
   notes: { type: String, default: "" },
   updatedAt: { type: Date, default: Date.now },
 });

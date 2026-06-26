@@ -5,6 +5,7 @@ export interface IDayComment extends Document {
   leadId: mongoose.Types.ObjectId;
   day: number;
   comment: string;
+  joineeComment?: string;
   updatedAt: Date;
 }
 
@@ -13,6 +14,7 @@ const DayCommentSchema = new Schema<IDayComment>({
   leadId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   day: { type: Number, required: true },
   comment: { type: String, required: true, default: "" },
+  joineeComment: { type: String, default: "" },
   updatedAt: { type: Date, default: Date.now },
 });
 

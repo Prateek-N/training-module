@@ -8,7 +8,7 @@ import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "training-secret-key-12345";
 
-export async function loginUser(prevState: any, formData: FormData) {
+export async function loginUser(prevState: unknown, formData: FormData) {
   try {
     await connectToDatabase();
     const username = formData.get("username")?.toString().trim().toLowerCase();
@@ -44,9 +44,10 @@ export async function loginUser(prevState: any, formData: FormData) {
     });
 
     return { success: true, user: { name: user.name, role: user.role, username: user.username } };
-  } catch (error: any) {
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
     console.error("Login error:", error);
-    return { success: false, error: error.message || "An unexpected error occurred" };
+    return { success: false, error: errorMessage };
   }
 }
 
@@ -76,7 +77,7 @@ export async function getCurrentUser() {
       buddy: user.buddy,
       startDate: user.startDate.toISOString(),
     };
-  } catch (error) {
+  } catch {
     return null;
   }
 }

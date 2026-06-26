@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/actions/auth";
 import { getJoineesList } from "@/actions/admin";
 import { getJoineeProgress, getJoineeComments } from "@/actions/progress";
-import DashboardClient from "./DashboardClient";
+import DashboardClient, { Joinee } from "./DashboardClient";
 import tasksData from "@/lib/tasks.json";
 
 export default async function DashboardPage() {
@@ -11,9 +11,10 @@ export default async function DashboardPage() {
     redirect("/login");
   }
 
-  let initialJoinees: any[] = [];
-  let initialProgress: Record<string, { completed: boolean; notes: string }> = {};
+  let initialJoinees: Joinee[] = [];
+  let initialProgress: Record<string, { completed: boolean; inProgress: boolean; notes: string }> = {};
   let initialComments: Record<number, string> = {};
+  let initialJoineeComments: Record<number, string> = {};
 
   if (user.role === "lead") {
     const res = await getJoineesList();
@@ -28,8 +29,13 @@ export default async function DashboardPage() {
     if (progressRes.success && progressRes.progressMap) {
       initialProgress = progressRes.progressMap;
     }
-    if (commentsRes.success && commentsRes.commentsMap) {
-      initialComments = commentsRes.commentsMap;
+    if (commentsRes.success) {
+      if (commentsRes.commentsMap) {
+        initialComments = commentsRes.commentsMap;
+      }
+      if (commentsRes.joineeCommentsMap) {
+        initialJoineeComments = commentsRes.joineeCommentsMap;
+      }
     }
   }
 
@@ -39,6 +45,7 @@ export default async function DashboardPage() {
       initialJoinees={initialJoinees}
       initialProgress={initialProgress}
       initialComments={initialComments}
+      initialJoineeComments={initialJoineeComments}
       allTasks={tasksData}
     />
   );

@@ -1,5 +1,5 @@
 import LoginForm from "./LoginForm";
-import { seedDefaultLead } from "@/actions/admin";
+import { seedDefaultLead, seedMandatoryDoc } from "@/actions/admin";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/actions/auth";
 
@@ -9,7 +9,10 @@ export default async function LoginPage() {
     redirect("/dashboard");
   }
 
-  await seedDefaultLead();
+  await Promise.all([
+    seedDefaultLead(),
+    seedMandatoryDoc()
+  ]);
 
   return (
     <main className="flex min-h-screen items-center justify-center p-4 bg-bg">
