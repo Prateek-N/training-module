@@ -381,3 +381,19 @@ export async function getSopDoc() {
     return { success: false, error: errorMessage };
   }
 }
+
+export async function getWhyDoc() {
+  try {
+    const filePath = path.join(process.cwd(), "src", "old-static", "Why.md");
+    if (!fs.existsSync(filePath)) {
+      return { success: false, error: "Why document not found." };
+    }
+    const content = fs.readFileSync(filePath, "utf-8");
+    return { success: true, doc: content };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    console.error("Get Why doc error:", error);
+    return { success: false, error: errorMessage };
+  }
+}
+

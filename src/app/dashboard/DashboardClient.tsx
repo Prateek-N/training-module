@@ -3,7 +3,7 @@
 import React, { useState, useTransition, useActionState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { logoutUser } from "@/actions/auth";
-import { registerJoinee, getJoineesList, deleteJoinee, getSopDoc, getMandatoryDoc } from "@/actions/admin";
+import { registerJoinee, getJoineesList, deleteJoinee, getSopDoc, getMandatoryDoc, getWhyDoc } from "@/actions/admin";
 import { 
   toggleTaskCompletion, 
   getJoineeProgress, 
@@ -32,7 +32,8 @@ import {
   Moon,
   Trash2,
   ClipboardList,
-  BookOpen
+  BookOpen,
+  HelpCircle
 } from "lucide-react";
 
 interface Task {
@@ -160,6 +161,13 @@ export default function DashboardClient({
   const [mandatoryContent, setMandatoryContent] = useState<string>("");
   const [loadingMandatory, setLoadingMandatory] = useState<boolean>(false);
 
+  // Why Compliance Modal states
+  const [isWhyModalOpen, setIsWhyModalOpen] = useState<boolean>(false);
+  const [whyContent, setWhyContent] = useState<string>("");
+  const [loadingWhy, setLoadingWhy] = useState<boolean>(false);
+  const [activeWhyTab, setActiveWhyTab] = useState<string>("overview");
+  const [whyReadProgress, setWhyReadProgress] = useState<Record<string, boolean>>({});
+
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
   useEffect(() => {
@@ -262,6 +270,44 @@ export default function DashboardClient({
         alert("Failed to load Study Guide: " + res.error);
       }
       setLoadingMandatory(false);
+    }
+  };
+
+  // Open Why Compliance action
+  const handleOpenWhyModal = async () => {
+    setIsWhyModalOpen(true);
+    if (!whyContent) {
+      setLoadingWhy(true);
+      const res = await getWhyDoc();
+      if (res.success && res.doc) {
+        setWhyContent(res.doc);
+      } else {
+        alert("Failed to load compliance rationale: " + res.error);
+      }
+      setLoadingWhy(false);
+    }
+  };
+
+  // Load Why.md read progress from localStorage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("why_read_progress");
+      if (saved) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setWhyReadProgress(JSON.parse(saved));
+      }
+    } catch (e) {
+      console.error("Failed to load why read progress", e);
+    }
+  }, []);
+
+  const handleToggleWhyRead = (tabId: string, checked: boolean) => {
+    const updated = { ...whyReadProgress, [tabId]: checked };
+    setWhyReadProgress(updated);
+    try {
+      localStorage.setItem("why_read_progress", JSON.stringify(updated));
+    } catch (e) {
+      console.error("Failed to save why read progress", e);
     }
   };
 
@@ -744,6 +790,13 @@ export default function DashboardClient({
             >
               <ClipboardList size={12} />
               <span>SOP Checklist</span>
+            </button>
+            <button
+              onClick={handleOpenWhyModal}
+              className="flex items-center gap-2 px-5 py-2.5 border border-line bg-panel hover:bg-panel-2 transition text-xs font-bold uppercase tracking-wider text-text-primary rounded-button cursor-pointer"
+            >
+              <HelpCircle size={12} />
+              <span>Why It Matters</span>
             </button>
           </div>
         </div>
@@ -2239,6 +2292,144 @@ export default function DashboardClient({
           </div>
         </div>
       )}
+      {/* WHY COMPLIANCE / WHY IT MATTERS MODAL */}
+      {isWhyModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-5xl bg-card border border-line rounded-none shadow-2xl relative flex flex-col max-h-[90vh] text-xs">
+            {/* Modal Header */}
+            <div className="p-6 border-b border-line flex justify-between items-center bg-card">
+              <div>
+                <h3 className="text-xl font-display font-normal text-text-primary uppercase tracking-wider leading-none">
+                  🔐 COMPLIANCE PORTAL: WHY IT MATTERS
+                </h3>
+                <p className="text-[10px] text-text-secondary font-bold uppercase tracking-widest mt-1">Understanding the Rationale Behind Our Standard Operating Procedures</p>
+              </div>
+              <button
+                onClick={() => setIsWhyModalOpen(false)}
+                className="text-text-secondary hover:text-text-primary text-xl font-bold border border-line bg-panel hover:bg-panel-2 w-8 h-8 rounded-full flex items-center justify-center cursor-pointer transition"
+              >
+                ×
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-6 overflow-y-auto flex-1 bg-card">
+              {loadingWhy ? (
+                <div className="flex flex-col items-center justify-center py-12 text-text-secondary">
+                  <span className="text-sm font-bold uppercase tracking-wider">Loading Compliance Rationale...</span>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-[60vh]">
+                  {/* Left Sidebar Pane */}
+                  <div className="col-span-1 md:border-r md:border-line pr-0 md:pr-4 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto pb-2 md:pb-0 scrollbar-thin">
+                    {parseWhyContent(whyContent).map((sec) => {
+                      const isCompleted = sec.id === "overview" || !!whyReadProgress[sec.id];
+                      return (
+                        <button
+                          key={sec.id}
+                          type="button"
+                          onClick={() => setActiveWhyTab(sec.id)}
+                          className={`flex-shrink-0 text-left px-4 py-2.5 rounded-button text-xs font-bold transition cursor-pointer flex items-center justify-between gap-2 uppercase tracking-wider ${
+                            activeWhyTab === sec.id
+                              ? "bg-accent border border-accent text-accent-text"
+                              : "bg-panel border border-line text-text-secondary hover:bg-panel-2 hover:text-text-primary"
+                          }`}
+                        >
+                          <span className="truncate pr-1 text-[10px]">{sec.title}</span>
+                          {sec.id !== "overview" && (
+                            <span className={`text-[10px] font-bold ${isCompleted ? "text-good font-extrabold" : "text-text-secondary/30"}`}>
+                              {isCompleted ? "✓" : "○"}
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {/* Right Content Pane */}
+                  <div className="col-span-1 md:col-span-3 overflow-y-auto pl-0 md:pl-2 pr-2 scrollbar-thin h-full flex flex-col justify-between">
+                    {(() => {
+                      const sections = parseWhyContent(whyContent);
+                      const activeSec = sections.find(s => s.id === activeWhyTab);
+                      if (!activeSec) return null;
+
+                      // Check if all sections (excluding overview) are completed
+                      const nonOverviewSections = sections.filter(s => s.id !== "overview");
+                      const allRead = nonOverviewSections.length > 0 && nonOverviewSections.every(s => whyReadProgress[s.id]);
+
+                      return (
+                        <div className="space-y-4 flex-1 flex flex-col justify-between">
+                          <div className="space-y-4">
+                            <h4 className="text-xl font-display font-normal text-text-primary uppercase tracking-wider border-b border-line pb-2">
+                              {activeSec.title}
+                            </h4>
+                            <div className="max-w-3xl space-y-4">
+                              {renderMarkdown(activeSec.content)}
+                            </div>
+                          </div>
+
+                          {/* Interactive Rationale Checkbox Card */}
+                          {activeSec.id !== "overview" && (
+                            <div className={`p-4 border mt-6 flex items-center justify-between transition rounded-none ${
+                              whyReadProgress[activeWhyTab]
+                                ? "bg-good-dim border-good-border"
+                                : "bg-panel border-line hover:border-text-secondary"
+                            }`}>
+                              <label className="flex items-center gap-3 cursor-pointer select-none">
+                                <input
+                                  type="checkbox"
+                                  checked={!!whyReadProgress[activeWhyTab]}
+                                  onChange={(e) => handleToggleWhyRead(activeWhyTab, e.target.checked)}
+                                  className="accent-good w-4 h-4 rounded-none cursor-pointer"
+                                />
+                                <div className="text-left">
+                                  <span className="text-xs font-bold text-text-primary uppercase tracking-wider block">I understand this rationale</span>
+                                  <span className="text-[10px] text-text-secondary">I acknowledge the importance and consequences of this compliance guideline.</span>
+                                </div>
+                              </label>
+                            </div>
+                          )}
+
+                          {activeSec.id === "overview" && allRead && (
+                            <div className="p-6 border border-good bg-good-dim text-center space-y-4 rounded-none mt-6 animate-fade-in">
+                              <span className="text-3xl block">🏆</span>
+                              <h4 className="text-md font-bold text-good uppercase tracking-wider">Compliance Study Completed!</h4>
+                              <p className="text-[11px] text-text-secondary max-w-md mx-auto leading-relaxed">
+                                You have successfully read and acknowledged the rationale behind all onboarding compliance requirements. You are fully ready to support our sessions at the highest standard!
+                              </p>
+                            </div>
+                          )}
+                          
+                          {activeSec.id === "overview" && !allRead && (
+                            <div className="p-6 border border-line bg-panel text-center space-y-4 rounded-none mt-6">
+                              <span className="text-2xl block">📖</span>
+                              <h4 className="text-xs font-bold text-text-primary uppercase tracking-wider">Ready to Begin?</h4>
+                              <p className="text-[11px] text-text-secondary max-w-md mx-auto leading-relaxed">
+                                Click the sections in the sidebar to review the key rationales. Mark each section as read to complete your compliance training.
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (sections.length > 1) {
+                                    setActiveWhyTab(sections[1].id);
+                                  }
+                                }}
+                                className="px-4 py-2 border border-line bg-panel hover:bg-panel-2 hover:text-text-primary text-[10px] font-bold uppercase tracking-wider rounded-button cursor-pointer transition"
+                              >
+                                Start Reading
+                              </button>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })()}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
@@ -2504,3 +2695,55 @@ const renderMarkdown = (text: string): React.ReactNode => {
   
   return <div className="space-y-4">{renderedElements}</div>;
 };
+
+interface WhySection {
+  id: string;
+  title: string;
+  content: string;
+}
+
+const parseWhyContent = (text: string): WhySection[] => {
+  if (!text) return [];
+  const lines = text.split("\n");
+  const sections: WhySection[] = [];
+  
+  let currentSection: WhySection = {
+    id: "overview",
+    title: "Overview 🛡️",
+    content: ""
+  };
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (line.trim().startsWith("## ")) {
+      if (currentSection.content.trim() || currentSection.id === "overview") {
+        sections.push({
+          ...currentSection,
+          content: currentSection.content.trim()
+        });
+      }
+      
+      const title = line.replace("## ", "").trim();
+      const id = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+      currentSection = {
+        id,
+        title,
+        content: ""
+      };
+    } else if (line.trim().startsWith("# ")) {
+      currentSection.content += line + "\n";
+    } else {
+      currentSection.content += line + "\n";
+    }
+  }
+  
+  if (currentSection.content.trim()) {
+    sections.push({
+      ...currentSection,
+      content: currentSection.content.trim()
+    });
+  }
+  
+  return sections;
+};
+
