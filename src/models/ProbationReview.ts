@@ -5,6 +5,7 @@ export interface IProbationReview extends Document {
   leadId: mongoose.Types.ObjectId;
   status: "completed" | "extended" | "failed";
   finalInterviewsCount: number;
+  finalAssessmentsCount: number;
   keyAccomplishments: string;
   performanceMetrics: string;
   justification: string;
@@ -17,6 +18,7 @@ const ProbationReviewSchema = new Schema<IProbationReview>({
   leadId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   status: { type: String, enum: ["completed", "extended", "failed"], required: true },
   finalInterviewsCount: { type: Number, required: true, default: 0 },
+  finalAssessmentsCount: { type: Number, required: true, default: 0 },
   keyAccomplishments: { type: String, default: "" },
   performanceMetrics: { type: String, default: "" },
   justification: { type: String, required: true },

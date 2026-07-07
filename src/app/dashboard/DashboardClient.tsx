@@ -74,6 +74,7 @@ interface DashboardClientProps {
 interface ProbationReviewData {
   status: "completed" | "extended" | "failed";
   finalInterviewsCount: number;
+  finalAssessmentsCount: number;
   keyAccomplishments: string;
   performanceMetrics: string;
   justification: string;
@@ -114,11 +115,12 @@ export default function DashboardClient({
   const [leadActiveTab, setLeadActiveTab] = useState<"month1" | "month2" | "month3" | "review">("month1");
 
   // Weekly logs states (Months 2 & 3 / Weeks 7–18)
-  const [weeklyLogs, setWeeklyLogs] = useState<Record<number, { interviewsCount: number; achievements: string; metrics: string; leadComment: string }>>({});
+  const [weeklyLogs, setWeeklyLogs] = useState<Record<number, { interviewsCount: number; assessmentsCount: number; achievements: string; metrics: string; leadComment: string }>>({});
   const [selectedWeek, setSelectedWeek] = useState<number>(7);
 
   // Weekly inputs state
   const [weekInterviews, setWeekInterviews] = useState<string>("0");
+  const [weekAssessments, setWeekAssessments] = useState<string>("0");
   const [weekAchievements, setWeekAchievements] = useState<string>("");
   const [weekMetrics, setWeekMetrics] = useState<string>("");
   const [savingWeekLog, setSavingWeekLog] = useState<boolean>(false);
@@ -131,6 +133,7 @@ export default function DashboardClient({
   const [probationReview, setProbationReview] = useState<ProbationReviewData | null>(null);
   const [reviewStatus, setReviewStatus] = useState<"completed" | "extended" | "failed">("completed");
   const [reviewInterviews, setReviewInterviews] = useState<number>(0);
+  const [reviewAssessments, setReviewAssessments] = useState<number>(0);
   const [reviewAchievements, setReviewAchievements] = useState<string>("");
   const [reviewMetrics, setReviewMetrics] = useState<string>("");
   const [reviewJustification, setReviewJustification] = useState<string>("");
@@ -379,6 +382,7 @@ export default function DashboardClient({
       setProbationReview(reviewRes.review);
       setReviewStatus(reviewRes.review.status);
       setReviewInterviews(reviewRes.review.finalInterviewsCount);
+      setReviewAssessments(reviewRes.review.finalAssessmentsCount || 0);
       setReviewAchievements(reviewRes.review.keyAccomplishments);
       setReviewMetrics(reviewRes.review.performanceMetrics);
       setReviewJustification(reviewRes.review.justification);
@@ -387,6 +391,7 @@ export default function DashboardClient({
       setProbationReview(null);
       setReviewStatus("completed");
       setReviewInterviews(0);
+      setReviewAssessments(0);
       setReviewAchievements("");
       setReviewMetrics("");
       setReviewJustification("");
@@ -415,9 +420,10 @@ export default function DashboardClient({
 
   // Sync weekly form inputs when week or weeklyLogs changes
   useEffect(() => {
-    const currentWeekLog = weeklyLogs[selectedWeek] || { interviewsCount: 0, achievements: "", metrics: "", leadComment: "" };
+    const currentWeekLog = weeklyLogs[selectedWeek] || { interviewsCount: 0, assessmentsCount: 0, achievements: "", metrics: "", leadComment: "" };
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setWeekInterviews(String(currentWeekLog.interviewsCount || 0));
+    setWeekAssessments(String(currentWeekLog.assessmentsCount || 0));
     setWeekAchievements(currentWeekLog.achievements || "");
     setWeekMetrics(currentWeekLog.metrics || "");
     setWeekFeedbackText(currentWeekLog.leadComment || "");
@@ -430,6 +436,7 @@ export default function DashboardClient({
 
     if ((isLeadReviewActive || isJoineeReviewActive) && !probationReview) {
       let totalInterviews = 0;
+      let totalAssessments = 0;
       const achievementsList: string[] = [];
       const metricsList: string[] = [];
 
@@ -437,6 +444,7 @@ export default function DashboardClient({
         const log = weeklyLogs[w];
         if (log) {
           totalInterviews += log.interviewsCount || 0;
+          totalAssessments += log.assessmentsCount || 0;
           if (log.achievements?.trim()) {
             achievementsList.push(`• Week ${w}: ${log.achievements.trim()}`);
           }
@@ -448,6 +456,7 @@ export default function DashboardClient({
 
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setReviewInterviews(totalInterviews);
+      setReviewAssessments(totalAssessments);
       setReviewAchievements(achievementsList.join("\n"));
       setReviewMetrics(metricsList.join("\n"));
     }
@@ -457,8 +466,10 @@ export default function DashboardClient({
   const handleSaveWeeklyLog = async () => {
     setSavingWeekLog(true);
     const count = parseInt(weekInterviews) || 0;
+    const assessCount = parseInt(weekAssessments) || 0;
     const res = await saveWeeklyLog(currentUser.id, selectedWeek, {
       interviewsCount: count,
+      assessmentsCount: assessCount,
       achievements: weekAchievements,
       metrics: weekMetrics,
     });
@@ -469,6 +480,7 @@ export default function DashboardClient({
         [selectedWeek]: {
           ...prev[selectedWeek],
           interviewsCount: count,
+          assessmentsCount: assessCount,
           achievements: weekAchievements,
           metrics: weekMetrics,
           leadComment: prev[selectedWeek]?.leadComment || ""
@@ -493,6 +505,7 @@ export default function DashboardClient({
         [selectedWeek]: {
           ...prev[selectedWeek],
           interviewsCount: prev[selectedWeek]?.interviewsCount || 0,
+          assessmentsCount: prev[selectedWeek]?.assessmentsCount || 0,
           achievements: prev[selectedWeek]?.achievements || "",
           metrics: prev[selectedWeek]?.metrics || "",
           leadComment: weekFeedbackText
@@ -517,6 +530,7 @@ export default function DashboardClient({
     const res = await submitProbationReview(selectedJoinee, {
       status: reviewStatus,
       finalInterviewsCount: reviewInterviews,
+      finalAssessmentsCount: reviewAssessments,
       keyAccomplishments: reviewAchievements,
       performanceMetrics: reviewMetrics,
       justification: reviewJustification,
@@ -527,6 +541,7 @@ export default function DashboardClient({
       setProbationReview({
         status: reviewStatus,
         finalInterviewsCount: reviewInterviews,
+        finalAssessmentsCount: reviewAssessments,
         keyAccomplishments: reviewAchievements,
         performanceMetrics: reviewMetrics,
         justification: reviewJustification,
@@ -1126,7 +1141,7 @@ export default function DashboardClient({
                     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
                       {(activeTab === "month2" ? [7, 8, 9, 10, 11, 12] : [13, 14, 15, 16, 17, 18]).map((week) => {
                         const log = weeklyLogs[week];
-                        const hasLog = log && (log.interviewsCount > 0 || log.achievements || log.metrics);
+                        const hasLog = log && (log.interviewsCount > 0 || log.assessmentsCount > 0 || log.achievements || log.metrics);
                         
                         return (
                           <button
@@ -1163,17 +1178,31 @@ export default function DashboardClient({
                     </div>
 
                     <div className="glass-panel p-6 rounded-none space-y-4">
-                      <div>
-                        <label className="block text-[10px] font-bold text-text-primary mb-1 uppercase tracking-wider">
-                          Number of Interviews Conducted
-                        </label>
-                        <input
-                          type="number"
-                          min="0"
-                          value={weekInterviews}
-                          onChange={(e) => setWeekInterviews(e.target.value)}
-                          className="w-full px-4 py-2.5 rounded-input bg-panel border border-line text-text-primary focus:outline-none focus:bg-card focus:border-accent text-xs font-semibold uppercase tracking-wider"
-                        />
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[10px] font-bold text-text-primary mb-1 uppercase tracking-wider">
+                            Number of Interviews Conducted
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={weekInterviews}
+                            onChange={(e) => setWeekInterviews(e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-input bg-panel border border-line text-text-primary focus:outline-none focus:bg-card focus:border-accent text-xs font-semibold uppercase tracking-wider"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold text-text-primary mb-1 uppercase tracking-wider">
+                            Number of Assessments Completed
+                          </label>
+                          <input
+                            type="number"
+                            min="0"
+                            value={weekAssessments}
+                            onChange={(e) => setWeekAssessments(e.target.value)}
+                            className="w-full px-4 py-2.5 rounded-input bg-panel border border-line text-text-primary focus:outline-none focus:bg-card focus:border-accent text-xs font-semibold uppercase tracking-wider"
+                          />
+                        </div>
                       </div>
 
                       <div>
@@ -1287,12 +1316,18 @@ export default function DashboardClient({
                         </span>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-xs">
                         <div className="space-y-1">
                           <span className="text-[9px] font-bold text-text-secondary uppercase tracking-widest">
                             Final Interviews Conducted
                           </span>
                           <p className="text-lg font-bold text-text-primary uppercase tracking-wider">{probationReview.finalInterviewsCount} Interviews</p>
+                        </div>
+                        <div className="space-y-1">
+                          <span className="text-[9px] font-bold text-text-secondary uppercase tracking-widest">
+                            Final Assessments Completed
+                          </span>
+                          <p className="text-lg font-bold text-text-primary uppercase tracking-wider">{probationReview.finalAssessmentsCount || 0} Assessments</p>
                         </div>
                         <div className="space-y-1">
                           <span className="text-[9px] font-bold text-text-secondary uppercase tracking-widest">
@@ -1780,7 +1815,7 @@ export default function DashboardClient({
                               <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-thin">
                                 {(leadActiveTab === "month2" ? [7, 8, 9, 10, 11, 12] : [13, 14, 15, 16, 17, 18]).map((week) => {
                                   const log = weeklyLogs[week];
-                                  const hasLog = log && (log.interviewsCount > 0 || log.achievements || log.metrics);
+                                  const hasLog = log && (log.interviewsCount > 0 || log.assessmentsCount > 0 || log.achievements || log.metrics);
                                   
                                   return (
                                     <button
@@ -1814,7 +1849,7 @@ export default function DashboardClient({
                                     </span>
                                   </div>
 
-                                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-sans">
+                                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs font-sans">
                                     <div className="p-3 bg-panel border border-line space-y-1">
                                       <span className="text-[9px] font-bold text-text-secondary uppercase tracking-widest block font-sans">
                                         Interviews Conducted:
@@ -1823,7 +1858,15 @@ export default function DashboardClient({
                                         {weeklyLogs[selectedWeek]?.interviewsCount || 0}
                                       </span>
                                     </div>
-                                    <div className="p-3 bg-panel border border-line space-y-1 md:col-span-2">
+                                    <div className="p-3 bg-panel border border-line space-y-1">
+                                      <span className="text-[9px] font-bold text-text-secondary uppercase tracking-widest block font-sans">
+                                        Assessments Completed:
+                                      </span>
+                                      <span className="text-sm font-bold text-text-primary font-mono">
+                                        {weeklyLogs[selectedWeek]?.assessmentsCount || 0}
+                                      </span>
+                                    </div>
+                                    <div className="p-3 bg-panel border border-line space-y-1 sm:col-span-2">
                                       <span className="text-[9px] font-bold text-text-secondary uppercase tracking-widest block font-sans">
                                         Achievements & Accomplishments:
                                       </span>
@@ -1831,7 +1874,7 @@ export default function DashboardClient({
                                         {weeklyLogs[selectedWeek]?.achievements ? `"${weeklyLogs[selectedWeek].achievements}"` : "None logged yet"}
                                       </p>
                                     </div>
-                                    <div className="p-3 bg-panel border border-line space-y-1 md:col-span-3">
+                                    <div className="p-3 bg-panel border border-line space-y-1 sm:col-span-2 md:col-span-4">
                                       <span className="text-[9px] font-bold text-text-secondary uppercase tracking-widest block font-sans">
                                         Metrics & Contributions:
                                       </span>
@@ -1888,7 +1931,7 @@ export default function DashboardClient({
                                 )}
                               </div>
 
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-sans">
+                              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-sans">
                                 <div className="p-4 bg-panel border border-line space-y-1">
                                   <span className="text-[9px] font-bold text-text-secondary uppercase tracking-widest block font-sans">
                                     Month 1 Training Checkmarks:
@@ -1899,17 +1942,25 @@ export default function DashboardClient({
                                 </div>
                                 <div className="p-4 bg-panel border border-line space-y-1">
                                   <span className="text-[9px] font-bold text-text-secondary uppercase tracking-widest block font-sans">
-                                    Month 2 & 3 Aggregated Interviews Conducted:
+                                    Month 2 & 3 Aggregated Interviews:
                                   </span>
                                   <span className="text-lg font-bold text-text-primary">
-                                    {reviewInterviews} Interviews conducted
+                                    {reviewInterviews} Interviews
+                                  </span>
+                                </div>
+                                <div className="p-4 bg-panel border border-line space-y-1">
+                                  <span className="text-[9px] font-bold text-text-secondary uppercase tracking-widest block font-sans">
+                                    Month 2 & 3 Aggregated Assessments:
+                                  </span>
+                                  <span className="text-lg font-bold text-text-primary">
+                                    {reviewAssessments} Assessments
                                   </span>
                                 </div>
                               </div>
 
                               {/* Review evaluation form */}
                               <div className="glass-panel p-6 rounded-none space-y-4">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                   <div>
                                     <label className="block text-[10px] font-bold text-text-primary mb-1 uppercase tracking-wider">
                                       Probation Review Decision
@@ -1926,13 +1977,25 @@ export default function DashboardClient({
                                   </div>
                                   <div>
                                     <label className="block text-[10px] font-bold text-text-primary mb-1 uppercase tracking-wider">
-                                      Total Interviews Count (Custom adjustment)
+                                      Total Interviews Count
                                     </label>
                                     <input
                                       type="number"
                                       min="0"
                                       value={reviewInterviews}
                                       onChange={(e) => setReviewInterviews(parseInt(e.target.value) || 0)}
+                                      className="w-full px-4 py-2.5 rounded-input bg-panel border border-line text-text-primary focus:outline-none focus:bg-card focus:border-accent text-xs font-semibold"
+                                    />
+                                  </div>
+                                  <div>
+                                    <label className="block text-[10px] font-bold text-text-primary mb-1 uppercase tracking-wider">
+                                      Total Assessments Count
+                                    </label>
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      value={reviewAssessments}
+                                      onChange={(e) => setReviewAssessments(parseInt(e.target.value) || 0)}
                                       className="w-full px-4 py-2.5 rounded-input bg-panel border border-line text-text-primary focus:outline-none focus:bg-card focus:border-accent text-xs font-semibold"
                                     />
                                   </div>

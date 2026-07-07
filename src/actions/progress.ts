@@ -221,7 +221,7 @@ export async function getJoineeComments(joineeId: string) {
 export async function saveWeeklyLog(
   joineeId: string,
   weekNumber: number,
-  data: { interviewsCount: number; achievements: string; metrics: string }
+  data: { interviewsCount: number; assessmentsCount: number; achievements: string; metrics: string }
 ) {
   try {
     const currentUser = await getCurrentUser();
@@ -240,6 +240,7 @@ export async function saveWeeklyLog(
       {
         $set: {
           interviewsCount: data.interviewsCount,
+          assessmentsCount: data.assessmentsCount,
           achievements: data.achievements || "",
           metrics: data.metrics || "",
           updatedAt: new Date(),
@@ -271,10 +272,11 @@ export async function getWeeklyLogs(joineeId: string) {
 
     const logs = await WeeklyLog.find({ userId: new mongoose.Types.ObjectId(joineeId) });
 
-    const logsMap: Record<number, { interviewsCount: number; achievements: string; metrics: string; leadComment: string }> = {};
+    const logsMap: Record<number, { interviewsCount: number; assessmentsCount: number; achievements: string; metrics: string; leadComment: string }> = {};
     logs.forEach((l) => {
       logsMap[l.weekNumber] = {
         interviewsCount: l.interviewsCount,
+        assessmentsCount: l.assessmentsCount || 0,
         achievements: l.achievements || "",
         metrics: l.metrics || "",
         leadComment: l.leadComment || "",
@@ -326,6 +328,7 @@ export async function submitProbationReview(
   reviewData: {
     status: "completed" | "extended" | "failed";
     finalInterviewsCount: number;
+    finalAssessmentsCount: number;
     keyAccomplishments: string;
     performanceMetrics: string;
     justification: string;
@@ -347,6 +350,7 @@ export async function submitProbationReview(
           leadId: new mongoose.Types.ObjectId(adminUser.id),
           status: reviewData.status,
           finalInterviewsCount: reviewData.finalInterviewsCount,
+          finalAssessmentsCount: reviewData.finalAssessmentsCount,
           keyAccomplishments: reviewData.keyAccomplishments || "",
           performanceMetrics: reviewData.performanceMetrics || "",
           justification: reviewData.justification,
@@ -389,6 +393,7 @@ export async function getProbationReview(joineeId: string) {
       review: {
         status: review.status,
         finalInterviewsCount: review.finalInterviewsCount,
+        finalAssessmentsCount: review.finalAssessmentsCount || 0,
         keyAccomplishments: review.keyAccomplishments,
         performanceMetrics: review.performanceMetrics,
         justification: review.justification,

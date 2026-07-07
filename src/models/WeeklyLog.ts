@@ -4,6 +4,7 @@ export interface IWeeklyLog extends Document {
   userId: mongoose.Types.ObjectId;
   weekNumber: number;
   interviewsCount: number;
+  assessmentsCount: number;
   achievements: string;
   metrics: string;
   leadComment?: string;
@@ -14,6 +15,7 @@ const WeeklyLogSchema = new Schema<IWeeklyLog>({
   userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
   weekNumber: { type: Number, required: true },
   interviewsCount: { type: Number, required: true, default: 0 },
+  assessmentsCount: { type: Number, required: true, default: 0 },
   achievements: { type: String, default: "" },
   metrics: { type: String, default: "" },
   leadComment: { type: String, default: "" },
