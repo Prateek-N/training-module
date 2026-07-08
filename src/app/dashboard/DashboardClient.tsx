@@ -169,8 +169,7 @@ export default function DashboardClient({
   const [whyContent, setWhyContent] = useState<string>("");
   const [loadingWhy, setLoadingWhy] = useState<boolean>(false);
   const [activeWhyTab, setActiveWhyTab] = useState<string>("overview");
-  const [whyReadProgress, setWhyReadProgress] = useState<Record<string, boolean>>({});
-  const [whyBulletProgress, setWhyBulletProgress] = useState<Record<string, boolean>>({});
+
 
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
@@ -292,106 +291,7 @@ export default function DashboardClient({
     }
   };
 
-  // Load Why.md read progress from localStorage on mount
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem("why_read_progress");
-      if (saved) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setWhyReadProgress(JSON.parse(saved));
-      }
-      const savedBullets = localStorage.getItem("why_bullet_progress");
-      if (savedBullets) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setWhyBulletProgress(JSON.parse(savedBullets));
-      }
-    } catch (e) {
-      console.error("Failed to load why read progress", e);
-    }
-  }, []);
 
-  const handleToggleWhyRead = (tabId: string, checked: boolean) => {
-    const updated = { ...whyReadProgress, [tabId]: checked };
-    setWhyReadProgress(updated);
-    try {
-      localStorage.setItem("why_read_progress", JSON.stringify(updated));
-    } catch (e) {
-      console.error("Failed to save why read progress", e);
-    }
-
-    // Synchronize bullet progress if the section is marked read/unread
-    if (whyContent) {
-      const sections = parseWhyContent(whyContent);
-      const sec = sections.find(s => s.id === tabId);
-      if (sec) {
-        const lines = sec.content.split("\n");
-        const bulletsCount = lines.filter(line => {
-          const trimmed = line.trim();
-          return trimmed.startsWith("* ") || trimmed.startsWith("- ");
-        }).length;
-
-        if (bulletsCount > 0) {
-          const updatedBullets = { ...whyBulletProgress };
-          let changed = false;
-          for (let i = 0; i < bulletsCount; i++) {
-            const bulletId = `${tabId}-bullet-${i}`;
-            if (updatedBullets[bulletId] !== checked) {
-              updatedBullets[bulletId] = checked;
-              changed = true;
-            }
-          }
-          if (changed) {
-            setWhyBulletProgress(updatedBullets);
-            try {
-              localStorage.setItem("why_bullet_progress", JSON.stringify(updatedBullets));
-            } catch (e) {
-              console.error("Failed to save why bullet progress", e);
-            }
-          }
-        }
-      }
-    }
-  };
-
-  const handleToggleWhyBullet = (bulletId: string, checked: boolean, secId: string, totalBullets: number) => {
-    const updated = { ...whyBulletProgress, [bulletId]: checked };
-    setWhyBulletProgress(updated);
-    try {
-      localStorage.setItem("why_bullet_progress", JSON.stringify(updated));
-    } catch (e) {
-      console.error("Failed to save why bullet progress", e);
-    }
-
-    // Automatically check if all bullets in this section are read
-    if (checked) {
-      let checkedCount = 0;
-      for (let i = 0; i < totalBullets; i++) {
-        const id = `${secId}-bullet-${i}`;
-        if (id === bulletId ? checked : !!updated[id]) {
-          checkedCount++;
-        }
-      }
-      if (checkedCount === totalBullets) {
-        // Mark the whole section as read/understood!
-        const updatedSections = { ...whyReadProgress, [secId]: true };
-        setWhyReadProgress(updatedSections);
-        try {
-          localStorage.setItem("why_read_progress", JSON.stringify(updatedSections));
-        } catch (e) {
-          console.error("Failed to save why read progress", e);
-        }
-      }
-    } else {
-      // If a bullet is unchecked, we also uncheck the whole section
-      const updatedSections = { ...whyReadProgress, [secId]: false };
-      setWhyReadProgress(updatedSections);
-      try {
-        localStorage.setItem("why_read_progress", JSON.stringify(updatedSections));
-      } catch (e) {
-        console.error("Failed to save why read progress", e);
-      }
-    }
-  };
 
   // Handle logout
   const handleLogout = async () => {
@@ -845,21 +745,14 @@ export default function DashboardClient({
     const lines = sec.content.split("\n");
     const renderedElements: React.ReactNode[] = [];
     
-    // First count total bullets in this section
-    const totalBullets = lines.filter(line => {
-      const trimmed = line.trim();
-      return trimmed.startsWith("* ") || trimmed.startsWith("- ");
-    }).length;
-
-    let bulletIndex = 0;
     let currentList: React.ReactNode[] = [];
     
     const flushList = (key: string | number) => {
       if (currentList.length > 0) {
         renderedElements.push(
-          <div key={`list-${key}`} className="space-y-3 mb-4 mt-2">
+          <ul key={`list-${key}`} className="list-disc pl-5 space-y-1.5 mb-4 text-[11px] leading-relaxed text-text-secondary">
             {[...currentList]}
-          </div>
+          </ul>
         );
         currentList = [];
       }
@@ -910,41 +803,17 @@ export default function DashboardClient({
         flushList(i);
         const cleanQuote = line.replace("> ", "");
         renderedElements.push(
-          <div key={i} className="p-4 bg-danger-dim border border-danger-border text-danger my-4 font-bold rounded-none leading-relaxed flex items-start gap-3">
-            <span className="text-base select-none mt-0.5">⚠️</span>
-            <span className="text-xs text-text-primary font-normal font-sans italic">{cleanQuote}</span>
+          <div key={i} className="p-4 bg-panel border border-line text-text-primary my-4 font-normal rounded-none leading-relaxed flex items-start gap-3">
+            <span className="text-base select-none mt-0.5">💡</span>
+            <span className="text-xs text-text-secondary font-normal font-sans italic">{cleanQuote}</span>
           </div>
         );
       } else if (line.startsWith("* ") || line.startsWith("- ")) {
         const cleanItem = line.replace(/^[\*\-]\s+/, "");
-        const bulletId = `${sec.id}-bullet-${bulletIndex}`;
-        const isBulletChecked = !!whyBulletProgress[bulletId];
-
-        bulletIndex++;
-
         currentList.push(
-          <div
-            key={`bullet-card-${i}`}
-            onClick={() => handleToggleWhyBullet(bulletId, !isBulletChecked, sec.id, totalBullets)}
-            className={`flex items-start gap-4 p-4 border transition-all duration-200 cursor-pointer select-none rounded-none ${
-              isBulletChecked
-                ? "bg-good-dim border-good-border shadow-sm"
-                : "bg-panel border-line hover:border-accent-border hover:bg-panel-2"
-            }`}
-          >
-            <div className="flex-shrink-0 mt-0.5">
-              <div className={`w-5 h-5 flex items-center justify-center border transition-all duration-200 ${
-                isBulletChecked 
-                  ? "bg-good border-good text-accent-text" 
-                  : "border-line text-transparent"
-              }`}>
-                <Check size={12} strokeWidth={3} className={isBulletChecked ? "opacity-100 scale-100 transition-all duration-200" : "opacity-0 scale-75"} />
-              </div>
-            </div>
-            <div className="flex-1 text-[11px] leading-relaxed text-text-primary">
-              {parseBoldText(cleanItem)}
-            </div>
-          </div>
+          <li key={`li-${i}`} className="pl-1">
+            {parseBoldText(cleanItem)}
+          </li>
         );
       } else {
         flushList(i);
@@ -2607,7 +2476,6 @@ export default function DashboardClient({
                   {/* Left Sidebar Pane */}
                   <div className="col-span-1 md:border-r md:border-line pr-0 md:pr-4 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-y-auto pb-2 md:pb-0 scrollbar-thin">
                     {parseWhyContent(whyContent).map((sec) => {
-                      const isCompleted = sec.id === "overview" || !!whyReadProgress[sec.id];
                       return (
                         <button
                           key={sec.id}
@@ -2620,11 +2488,6 @@ export default function DashboardClient({
                           }`}
                         >
                           <span className="truncate pr-1 text-[10px]">{getTabEmoji(sec.id)} {sec.title}</span>
-                          {sec.id !== "overview" && (
-                            <span className={`text-[10px] font-bold ${isCompleted ? "text-good font-extrabold" : "text-text-secondary/30"}`}>
-                              {isCompleted ? "✓" : "○"}
-                            </span>
-                          )}
                         </button>
                       );
                     })}
@@ -2637,10 +2500,6 @@ export default function DashboardClient({
                       const activeSec = sections.find(s => s.id === activeWhyTab);
                       if (!activeSec) return null;
 
-                      // Check if all sections (excluding overview) are completed
-                      const nonOverviewSections = sections.filter(s => s.id !== "overview");
-                      const allRead = nonOverviewSections.length > 0 && nonOverviewSections.every(s => whyReadProgress[s.id]);
-
                       return (
                         <div className="space-y-4 flex-1 flex flex-col justify-between">
                           <div className="space-y-4">
@@ -2651,59 +2510,6 @@ export default function DashboardClient({
                               {renderInteractiveWhyContent(activeSec)}
                             </div>
                           </div>
-
-                          {/* Interactive Rationale Checkbox Card */}
-                          {activeSec.id !== "overview" && (
-                            <div className={`p-4 border mt-6 flex items-center justify-between transition rounded-none ${
-                              whyReadProgress[activeWhyTab]
-                                ? "bg-good-dim border-good-border"
-                                : "bg-panel border-line hover:border-text-secondary"
-                            }`}>
-                              <label className="flex items-center gap-3 cursor-pointer select-none">
-                                <input
-                                  type="checkbox"
-                                  checked={!!whyReadProgress[activeWhyTab]}
-                                  onChange={(e) => handleToggleWhyRead(activeWhyTab, e.target.checked)}
-                                  className="accent-good w-4 h-4 rounded-none cursor-pointer"
-                                />
-                                <div className="text-left">
-                                  <span className="text-xs font-bold text-text-primary uppercase tracking-wider block">I understand this rationale</span>
-                                  <span className="text-[10px] text-text-secondary">I acknowledge the importance and consequences of this compliance guideline.</span>
-                                </div>
-                              </label>
-                            </div>
-                          )}
-
-                          {activeSec.id === "overview" && allRead && (
-                            <div className="p-6 border border-good bg-good-dim text-center space-y-4 rounded-none mt-6 animate-fade-in">
-                              <span className="text-3xl block">🏆</span>
-                              <h4 className="text-md font-bold text-good uppercase tracking-wider">Compliance Study Completed!</h4>
-                              <p className="text-[11px] text-text-secondary max-w-md mx-auto leading-relaxed">
-                                You have successfully read and acknowledged the rationale behind all onboarding compliance requirements. You are fully ready to support our sessions at the highest standard!
-                              </p>
-                            </div>
-                          )}
-                          
-                          {activeSec.id === "overview" && !allRead && (
-                            <div className="p-6 border border-line bg-panel text-center space-y-4 rounded-none mt-6">
-                              <span className="text-2xl block">📖</span>
-                              <h4 className="text-xs font-bold text-text-primary uppercase tracking-wider">Ready to Begin?</h4>
-                              <p className="text-[11px] text-text-secondary max-w-md mx-auto leading-relaxed">
-                                Click the sections in the sidebar to review the key rationales. Mark each section as read to complete your compliance training.
-                              </p>
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (sections.length > 1) {
-                                    setActiveWhyTab(sections[1].id);
-                                  }
-                                }}
-                                className="px-4 py-2 border border-line bg-panel hover:bg-panel-2 hover:text-text-primary text-[10px] font-bold uppercase tracking-wider rounded-button cursor-pointer transition"
-                              >
-                                Start Reading
-                              </button>
-                            </div>
-                          )}
                         </div>
                       );
                     })()}
