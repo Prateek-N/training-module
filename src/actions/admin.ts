@@ -384,9 +384,9 @@ export async function getSopDoc() {
 
 export async function getWhyDoc() {
   try {
-    const filePath = path.join(process.cwd(), "src", "old-static", "Why.md");
+    const filePath = path.join(process.cwd(), "src", "old-static", "imp.md");
     if (!fs.existsSync(filePath)) {
-      return { success: false, error: "Why document not found." };
+      return { success: false, error: "Important training document not found." };
     }
     const content = fs.readFileSync(filePath, "utf-8");
     return { success: true, doc: content };

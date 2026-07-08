@@ -170,6 +170,7 @@ export default function DashboardClient({
   const [loadingWhy, setLoadingWhy] = useState<boolean>(false);
   const [activeWhyTab, setActiveWhyTab] = useState<string>("overview");
   const [whyReadProgress, setWhyReadProgress] = useState<Record<string, boolean>>({});
+  const [whyBulletProgress, setWhyBulletProgress] = useState<Record<string, boolean>>({});
 
   const [theme, setTheme] = useState<"light" | "dark">("light");
 
@@ -299,6 +300,11 @@ export default function DashboardClient({
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setWhyReadProgress(JSON.parse(saved));
       }
+      const savedBullets = localStorage.getItem("why_bullet_progress");
+      if (savedBullets) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setWhyBulletProgress(JSON.parse(savedBullets));
+      }
     } catch (e) {
       console.error("Failed to load why read progress", e);
     }
@@ -311,6 +317,79 @@ export default function DashboardClient({
       localStorage.setItem("why_read_progress", JSON.stringify(updated));
     } catch (e) {
       console.error("Failed to save why read progress", e);
+    }
+
+    // Synchronize bullet progress if the section is marked read/unread
+    if (whyContent) {
+      const sections = parseWhyContent(whyContent);
+      const sec = sections.find(s => s.id === tabId);
+      if (sec) {
+        const lines = sec.content.split("\n");
+        const bulletsCount = lines.filter(line => {
+          const trimmed = line.trim();
+          return trimmed.startsWith("* ") || trimmed.startsWith("- ");
+        }).length;
+
+        if (bulletsCount > 0) {
+          const updatedBullets = { ...whyBulletProgress };
+          let changed = false;
+          for (let i = 0; i < bulletsCount; i++) {
+            const bulletId = `${tabId}-bullet-${i}`;
+            if (updatedBullets[bulletId] !== checked) {
+              updatedBullets[bulletId] = checked;
+              changed = true;
+            }
+          }
+          if (changed) {
+            setWhyBulletProgress(updatedBullets);
+            try {
+              localStorage.setItem("why_bullet_progress", JSON.stringify(updatedBullets));
+            } catch (e) {
+              console.error("Failed to save why bullet progress", e);
+            }
+          }
+        }
+      }
+    }
+  };
+
+  const handleToggleWhyBullet = (bulletId: string, checked: boolean, secId: string, totalBullets: number) => {
+    const updated = { ...whyBulletProgress, [bulletId]: checked };
+    setWhyBulletProgress(updated);
+    try {
+      localStorage.setItem("why_bullet_progress", JSON.stringify(updated));
+    } catch (e) {
+      console.error("Failed to save why bullet progress", e);
+    }
+
+    // Automatically check if all bullets in this section are read
+    if (checked) {
+      let checkedCount = 0;
+      for (let i = 0; i < totalBullets; i++) {
+        const id = `${secId}-bullet-${i}`;
+        if (id === bulletId ? checked : !!updated[id]) {
+          checkedCount++;
+        }
+      }
+      if (checkedCount === totalBullets) {
+        // Mark the whole section as read/understood!
+        const updatedSections = { ...whyReadProgress, [secId]: true };
+        setWhyReadProgress(updatedSections);
+        try {
+          localStorage.setItem("why_read_progress", JSON.stringify(updatedSections));
+        } catch (e) {
+          console.error("Failed to save why read progress", e);
+        }
+      }
+    } else {
+      // If a bullet is unchecked, we also uncheck the whole section
+      const updatedSections = { ...whyReadProgress, [secId]: false };
+      setWhyReadProgress(updatedSections);
+      try {
+        localStorage.setItem("why_read_progress", JSON.stringify(updatedSections));
+      } catch (e) {
+        console.error("Failed to save why read progress", e);
+      }
     }
   };
 
@@ -739,6 +818,148 @@ export default function DashboardClient({
 
   const activeDayTasks = allTasks.filter(t => t.day === activeDay);
   const activeDayCompleted = activeDayTasks.filter(t => progressMap[t.id]?.completed).length;
+
+  const getTabEmoji = (id: string): string => {
+    switch (id) {
+      case "overview": return "📋";
+      case "why-this-training-program-exists": return "💡";
+      case "training-philosophy": return "🧠";
+      case "what-we-are-teaching": return "📚";
+      case "why-the-training-starts-with-time-zones": return "⏰";
+      case "why-visa-knowledge-is-important": return "🛂";
+      case "why-we-teach-the-company-workflow": return "🔄";
+      case "why-resume-understanding-comes-first": return "📄";
+      case "why-mock-interviews-are-conducted": return "🗣️";
+      case "why-assessment-support-is-important": return "🧪";
+      case "why-client-interaction-training-matters": return "🤝";
+      case "why-interview-support-training-is-essential": return "🛡️";
+      case "why-we-focus-on-sop-mastery": return "🎯";
+      case "why-zero-error-performance-is-required": return "🚨";
+      case "expected-outcome-after-21-days": return "🏆";
+      default: return "📌";
+    }
+  };
+
+  const renderInteractiveWhyContent = (sec: WhySection): React.ReactNode => {
+    if (!sec || !sec.content) return null;
+    const lines = sec.content.split("\n");
+    const renderedElements: React.ReactNode[] = [];
+    
+    // First count total bullets in this section
+    const totalBullets = lines.filter(line => {
+      const trimmed = line.trim();
+      return trimmed.startsWith("* ") || trimmed.startsWith("- ");
+    }).length;
+
+    let bulletIndex = 0;
+    let currentList: React.ReactNode[] = [];
+    
+    const flushList = (key: string | number) => {
+      if (currentList.length > 0) {
+        renderedElements.push(
+          <div key={`list-${key}`} className="space-y-3 mb-4 mt-2">
+            {[...currentList]}
+          </div>
+        );
+        currentList = [];
+      }
+    };
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      
+      if (!line) {
+        flushList(i);
+        continue;
+      }
+      
+      if (line === "---") {
+        flushList(i);
+        renderedElements.push(
+          <hr key={i} className="border-line my-6" />
+        );
+      } else if (line.startsWith("# ")) {
+        flushList(i);
+        renderedElements.push(
+          <h1 key={i} className="text-2xl font-bold font-sans tracking-wide text-text-primary border-b border-line pb-2 mb-4 mt-6 uppercase">
+            {line.replace("# ", "")}
+          </h1>
+        );
+      } else if (line.startsWith("## ")) {
+        flushList(i);
+        renderedElements.push(
+          <h2 key={i} className="text-lg font-bold font-sans tracking-wide text-text-primary border-b border-line pb-1 mb-2 mt-4 uppercase">
+            {line.replace("## ", "")}
+          </h2>
+        );
+      } else if (line.startsWith("### ")) {
+        flushList(i);
+        renderedElements.push(
+          <h3 key={i} className="text-base font-bold font-sans text-text-primary mb-2 mt-3 uppercase">
+            {line.replace("### ", "")}
+          </h3>
+        );
+      } else if (line.startsWith("#### ")) {
+        flushList(i);
+        renderedElements.push(
+          <h4 key={i} className="text-sm font-bold font-sans text-text-primary mb-1 mt-2 uppercase">
+            {line.replace("#### ", "")}
+          </h4>
+        );
+      } else if (line.startsWith("> ")) {
+        flushList(i);
+        const cleanQuote = line.replace("> ", "");
+        renderedElements.push(
+          <div key={i} className="p-4 bg-danger-dim border border-danger-border text-danger my-4 font-bold rounded-none leading-relaxed flex items-start gap-3">
+            <span className="text-base select-none mt-0.5">⚠️</span>
+            <span className="text-xs text-text-primary font-normal font-sans italic">{cleanQuote}</span>
+          </div>
+        );
+      } else if (line.startsWith("* ") || line.startsWith("- ")) {
+        const cleanItem = line.replace(/^[\*\-]\s+/, "");
+        const bulletId = `${sec.id}-bullet-${bulletIndex}`;
+        const isBulletChecked = !!whyBulletProgress[bulletId];
+
+        bulletIndex++;
+
+        currentList.push(
+          <div
+            key={`bullet-card-${i}`}
+            onClick={() => handleToggleWhyBullet(bulletId, !isBulletChecked, sec.id, totalBullets)}
+            className={`flex items-start gap-4 p-4 border transition-all duration-200 cursor-pointer select-none rounded-none ${
+              isBulletChecked
+                ? "bg-good-dim border-good-border shadow-sm"
+                : "bg-panel border-line hover:border-accent-border hover:bg-panel-2"
+            }`}
+          >
+            <div className="flex-shrink-0 mt-0.5">
+              <div className={`w-5 h-5 flex items-center justify-center border transition-all duration-200 ${
+                isBulletChecked 
+                  ? "bg-good border-good text-accent-text" 
+                  : "border-line text-transparent"
+              }`}>
+                <Check size={12} strokeWidth={3} className={isBulletChecked ? "opacity-100 scale-100 transition-all duration-200" : "opacity-0 scale-75"} />
+              </div>
+            </div>
+            <div className="flex-1 text-[11px] leading-relaxed text-text-primary">
+              {parseBoldText(cleanItem)}
+            </div>
+          </div>
+        );
+      } else {
+        flushList(i);
+        renderedElements.push(
+          <p key={i} className="text-xs leading-relaxed text-text-secondary mb-3 font-sans">
+            {parseBoldText(line)}
+          </p>
+        );
+      }
+    }
+    
+    flushList("final");
+    
+    return <div className="space-y-4">{renderedElements}</div>;
+  };
 
   const filteredJoinees = joinees.filter(j => 
     j.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
@@ -2398,7 +2619,7 @@ export default function DashboardClient({
                               : "bg-panel border border-line text-text-secondary hover:bg-panel-2 hover:text-text-primary"
                           }`}
                         >
-                          <span className="truncate pr-1 text-[10px]">{sec.title}</span>
+                          <span className="truncate pr-1 text-[10px]">{getTabEmoji(sec.id)} {sec.title}</span>
                           {sec.id !== "overview" && (
                             <span className={`text-[10px] font-bold ${isCompleted ? "text-good font-extrabold" : "text-text-secondary/30"}`}>
                               {isCompleted ? "✓" : "○"}
@@ -2427,7 +2648,7 @@ export default function DashboardClient({
                               {activeSec.title}
                             </h4>
                             <div className="max-w-3xl space-y-4">
-                              {renderMarkdown(activeSec.content)}
+                              {renderInteractiveWhyContent(activeSec)}
                             </div>
                           </div>
 
@@ -2772,29 +2993,36 @@ const parseWhyContent = (text: string): WhySection[] => {
   
   let currentSection: WhySection = {
     id: "overview",
-    title: "Overview 🛡️",
+    title: "Overview",
     content: ""
   };
   
+  let isFirstHeader = true;
+
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    if (line.trim().startsWith("## ")) {
-      if (currentSection.content.trim() || currentSection.id === "overview") {
-        sections.push({
-          ...currentSection,
-          content: currentSection.content.trim()
-        });
+    const trimmed = line.trim();
+    
+    if (trimmed.startsWith("# ") && !trimmed.startsWith("## ")) {
+      if (isFirstHeader) {
+        isFirstHeader = false;
+        currentSection.content += line + "\n";
+      } else {
+        if (currentSection.content.trim() || currentSection.id === "overview") {
+          sections.push({
+            ...currentSection,
+            content: currentSection.content.trim()
+          });
+        }
+        
+        const title = trimmed.replace("# ", "").trim();
+        const id = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
+        currentSection = {
+          id,
+          title,
+          content: ""
+        };
       }
-      
-      const title = line.replace("## ", "").trim();
-      const id = title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
-      currentSection = {
-        id,
-        title,
-        content: ""
-      };
-    } else if (line.trim().startsWith("# ")) {
-      currentSection.content += line + "\n";
     } else {
       currentSection.content += line + "\n";
     }
