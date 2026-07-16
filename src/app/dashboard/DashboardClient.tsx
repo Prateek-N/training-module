@@ -882,6 +882,15 @@ export default function DashboardClient({
             <span className="text-[11px] font-bold text-text-secondary tracking-widest uppercase">📚 Study Material & Compliance:</span>
           </div>
           <div className="flex gap-3">
+            <a
+              href="https://scribehow.com/o/KSHKl94VQVWUFGogbHUZNA/viewer/Interview_Support_Guide__U1pgR1b3Sk6RT8HLRMy5XA"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-5 py-2.5 border border-line bg-panel hover:bg-panel-2 transition text-xs font-bold uppercase tracking-wider text-text-primary rounded-button cursor-pointer"
+            >
+              <ExternalLink size={12} />
+              <span>Interview Support Guide</span>
+            </a>
             <button
               onClick={handleOpenMandatoryModal}
               className="flex items-center gap-2 px-5 py-2.5 border border-line bg-panel hover:bg-panel-2 transition text-xs font-bold uppercase tracking-wider text-text-primary rounded-button cursor-pointer"
@@ -981,9 +990,9 @@ export default function DashboardClient({
                     </div>
                     <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-thin">
                       {[
-                        { nr: 1, label: "Phase 1: Days 1–8", desc: "SOP Foundations" },
-                        { nr: 2, label: "Phase 2: Days 9–15", desc: "Mocks & Prep" },
-                        { nr: 3, label: "Phase 3: Days 16–21", desc: "Client Briefs & Mastery" }
+                        { nr: 1, label: "Phase 1: Days 1–8", desc: "SOP Foundations & Mocks" },
+                        { nr: 2, label: "Phase 2: Days 9–15", desc: "Assessments & Client Prep" },
+                        { nr: 3, label: "Phase 3: Days 16–21", desc: "Interview Support & Mastery" }
                       ].map((p) => (
                         <button
                           key={p.nr}
@@ -1521,9 +1530,9 @@ export default function DashboardClient({
 
                 <div className="pt-4 border-t border-line space-y-3">
                   {[
-                    { nr: 1, label: "Phase 1: SOP Foundations (Days 1–8)", color: "bg-accent" },
-                    { nr: 2, label: "Phase 2: Mocks & Prep (Days 9–15)", color: "bg-accent" },
-                    { nr: 3, label: "Phase 3: Client Mastery (Days 16–21)", color: "bg-good" }
+                    { nr: 1, label: "Phase 1: SOP Foundations & Mocks (Days 1–8)", color: "bg-accent" },
+                    { nr: 2, label: "Phase 2: Assessments & Client Prep (Days 9–15)", color: "bg-accent" },
+                    { nr: 3, label: "Phase 3: Interview Support & Mastery (Days 16–21)", color: "bg-good" }
                   ].map((p) => (
                     <div key={p.nr}>
                       <div className="flex justify-between text-[10px] mb-1 font-bold uppercase tracking-wider">
